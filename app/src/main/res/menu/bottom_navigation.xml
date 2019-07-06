@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_singlefoot"
+        android:icon="@drawable/singlefoot"
+        android:title="Tek Ayak Çalışması"/>
+
+    <item
+        android:id="@+id/nav_multifoot"
+        android:icon="@drawable/multifoot"
+        android:title="İki Ayak Çalışması"/>
+
+    <item
+        android:id="@+id/nav_plank"
+        android:icon="@drawable/plank"
+        android:title="Plank"/>
+    <item
+        android:id="@+id/nav_bluetooth"
+        android:icon="@drawable/ic_bluetooth_black_24dp"
+        android:title="Cihazlar"/>
+
+</menu>
