@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -15,6 +16,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //Toolbar görünmesi için ama app bar layout kullandığımdan gerek kalmadı
+        android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar1);
+        toolbar.setTitle("amcuk");
+        this.setSupportActionBar(toolbar);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
         //açılışta home fragmenti gösteriyor
@@ -50,5 +55,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void infoPrinter(View view){
         Toast.makeText(this,"Print butonuna tıkladınız",Toast.LENGTH_LONG).show();
+    }
+    public void toolbarInfoPrinter(View view){
+        Toast.makeText(this,"Toolbar Print butonuna tıkladınız",Toast.LENGTH_LONG).show();
+
     }
 }
