@@ -20,9 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:background="?attr/colorPrimary"
-            app:title="@string/app_name"
-
-            >
+            app:title="@string/app_name">
 
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
@@ -31,7 +29,7 @@
                 <EditText
                     android:id="@+id/toolbarNameText"
                     android:layout_width="0dp"
-                    android:layout_height="32dp"
+                    android:layout_height="40dp"
                     android:layout_alignStart="@+id/cardview"
                     android:layout_alignParentTop="true"
                     android:layout_marginTop="12dp"
@@ -41,29 +39,30 @@
                     android:inputType="textPersonName"
                     android:textColor="@android:color/white"
                     android:textColorHint="@android:color/white"
-                    android:textSize="9sp"
+                    android:textSize="12sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/toolbarTckNoText"
                     app:layout_constraintStart_toEndOf="@+id/textView"
                     app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.75"
                     tools:ignore="MissingConstraints,NotSibling" />
 
                 <EditText
                     android:id="@+id/toolbarTckNoText"
                     android:layout_width="0dp"
-                    android:layout_height="32dp"
+                    android:layout_height="40dp"
                     android:layout_alignStart="@+id/cardview"
                     android:layout_alignParentTop="true"
                     android:layout_marginTop="1dp"
                     android:layout_marginEnd="10dp"
-                    android:layout_marginBottom="1dp"
+                    android:layout_marginBottom="5dp"
                     android:ems="10"
                     android:hint="Tck No"
                     android:inputType="textPersonName"
                     android:textColor="@android:color/white"
                     android:textColorHint="@android:color/white"
-                    android:textSize="9sp"
+                    android:textSize="12sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/toolbarImageView"
@@ -193,6 +192,7 @@
         android:layout_height="match_parent"
         android:layout_above="@id/bottom_navigation"
         android:layout_alignParentStart="true"
+        android:layout_marginStart="0dp"
         android:layout_marginBottom="0dp" />
 
   <android.support.design.widget.BottomNavigationView

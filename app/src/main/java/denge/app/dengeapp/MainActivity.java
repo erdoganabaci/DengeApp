@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         //Toolbar görünmesi için ama app bar layout kullandığımdan gerek kalmadı
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar1);
-        toolbar.setTitle("amcuk");
+        //toolbar.setTitle("degismiyor :(");
         this.setSupportActionBar(toolbar);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
                             selectedFragment = new BluetoothFragment();
                             break;
                     }
-                    //main layoutta o fragment yerine hangi fragment geçsin ona kara veriyoruz
+                    //main layoutta o fragment yerine hangi fragment geçsin ona karar veriyoruz
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,selectedFragment).commit();
                     //seçilen fragmenti getir.
                     return true;
