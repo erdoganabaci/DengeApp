@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNav.setOnNavigationItemSelectedListener(navListener);
         //açılışta home fragmenti gösteriyor
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new SingleFootFragment()).commit();
+
     }
     //fazla kod olasın diye create altına yazmadım
     private BottomNavigationView.OnNavigationItemSelectedListener navListener =
