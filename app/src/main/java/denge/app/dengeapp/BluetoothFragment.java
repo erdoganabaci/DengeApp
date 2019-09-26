@@ -4,6 +4,10 @@ import android.Manifest;
 import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
@@ -40,15 +44,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
+
+import static android.bluetooth.BluetoothAdapter.STATE_CONNECTED;
 
 public class BluetoothFragment extends Fragment {
     BluetoothAdapter myBluetooth;
     //eşleşmiş cihazları gösteriyoruz.etraftaki cihazları atıyoruz.
     private Set<BluetoothDevice> pairedDevices;
     ArrayList<String> leDevices;
+    ArrayList<BluetoothDevice> bleAllDevices;
+
 
     Button toggleButton;
     Button pairedButton;
+    Button getBatteryButton;
     private boolean mScanning;
     private Handler handler;
     private String TAG="DengeApp_BLUETOOTH_FRAGMENT";
@@ -57,6 +67,18 @@ public class BluetoothFragment extends Fragment {
     boolean leScanEnabled = false;
     ArrayAdapter adapter;
     ListView pairList;
+    BluetoothGatt dengeGatt;
+    BluetoothDevice myDevice;
+    BluetoothDevice dengeDevice;
+    private static final UUID Battery_Service_UUID = UUID.fromString("0000180F-0000-1000-8000-00805f9b34fb");
+    private static final UUID Battery_Level_UUID = UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb");
+    private static final UUID Ivme_Servisi_UUID = UUID.fromString("0000a888-0000-1000-8000-00805f9b34fb");
+    private static final UUID Ivme_Verisi_UUID = UUID.fromString("0000b888-0000-1000-8000-00805f9b34fb");
+
+    public BluetoothGattService batteryService;
+    public BluetoothGattCharacteristic batteryLevel;
+    public BluetoothGattService ivmeService;
+    public BluetoothGattCharacteristic ivmeDeger;
 
     private BluetoothAdapter.LeScanCallback leScanCallback =
             new BluetoothAdapter.LeScanCallback() {
@@ -66,6 +88,7 @@ public class BluetoothFragment extends Fragment {
                         @Override
                         public void run() {
                             Log.i(TAG, "onLeScan: "+device.getName()+" - "+device.getAddress());
+                            myDevice = device;
                             //Toast.makeText(getActivity(),device.getName()+" "+device.getAddress(),Toast.LENGTH_LONG).show();
 
                         }
@@ -73,18 +96,29 @@ public class BluetoothFragment extends Fragment {
                 }
             };
     private ScanCallback scanCallback = new ScanCallback() {
+
+
+
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
             bluetoothDevice = result.getDevice();
+
             //Toast.makeText(getActivity(),bluetoothDevice.getName()+" "+bluetoothDevice.getAddress(),Toast.LENGTH_LONG).show();
             if (bluetoothDevice.getName() != null){
                 if (bluetoothDevice.getName().startsWith("Denge")){
+                    bluetoothDevice = result.getDevice();
+                    dengeDevice = myBluetooth
+                            .getRemoteDevice(bluetoothDevice.getAddress());
+
+                   //Toast.makeText(getActivity(),dengeDevice.toString(),Toast.LENGTH_LONG).show();
+
                     Log.i(TAG, "onScanResult: "+"doğru "+bluetoothDevice.getName());
                     if (!leDevices.contains(bluetoothDevice.getName())){
                         leDevices.add(bluetoothDevice.getName());
                         adapter = new ArrayAdapter(getActivity(),android.R.layout.simple_list_item_1, (List) leDevices);
                         pairList.setAdapter(adapter);
+
                         //listede değişiklik olursa güncelle
                         adapter.notifyDataSetChanged();
                     }
@@ -92,6 +126,7 @@ public class BluetoothFragment extends Fragment {
                 }
 
             }
+
             Log.i(TAG, "onLeScan: "+bluetoothDevice.getName()+" - "+bluetoothDevice.getAddress());
             //deviceAddress.setText(bluetoothDevice.getAddress());
             //deviceName.setText(bluetoothDevice.getName());
@@ -133,6 +168,63 @@ public class BluetoothFragment extends Fragment {
         }
     };
 
+    BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
+        @Override
+        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            if(status == BluetoothGatt.GATT_SUCCESS) {
+                byte[] gattCharacteristic = characteristic.getValue();
+                String ivmeString = characteristic.getStringValue(0);
+                Log.d(TAG,"İvme Geldi"+ivmeString);
+
+                Log.d(TAG,"Pil Geldi"+gattCharacteristic[0]);
+
+                Toast.makeText(getActivity(),gattCharacteristic[0],Toast.LENGTH_LONG).show();
+            }
+
+        }
+
+        @Override
+        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            if (newState == STATE_CONNECTED){
+                Log.d(TAG,"Bağlantı tamamlandı."+ gatt.getDevice().getName() );
+                bluetoothLeScanner.stopScan( scanCallback);
+                gatt.discoverServices();
+
+
+//                batteryService = gatt.getService(Battery_Service_UUID);
+//                Log.d(TAG,"Batt service uuid: "+ batteryService.getUuid());
+//
+//                if(batteryService == null) {
+//                    Log.d(TAG, "Battery service not found!");
+//                    return;
+//                }
+//                batteryLevel = batteryService.getCharacteristic(Battery_Level_UUID);
+//                Log.d(TAG, "battery level: "+batteryLevel);
+//                if(batteryLevel == null) {
+//                    Log.d(TAG, "Battery level not found!");
+//                    return;
+//                }
+
+                //gatt.discoverServices();
+                //gatt.readCharacteristic(batteryLevel);
+                //Log.d(TAG,"Pil tamamlandı.");
+
+
+
+            } else {
+                Log.d(TAG, "failed");
+            }
+
+        }
+
+        @Override
+        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            super.onServicesDiscovered(gatt, status);
+            Log.i(TAG, "onServicesDiscovered: " + gatt.getServices().size());
+        }
+    };
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -146,6 +238,7 @@ public class BluetoothFragment extends Fragment {
         toggleButton = fragmentView.findViewById(R.id.toggleButton);
         pairedButton = fragmentView.findViewById(R.id.pairedButton);
         pairList = fragmentView.findViewById(R.id.pairedList);
+        getBatteryButton = fragmentView.findViewById(R.id.getBatteryButton);
         bluetoothLeScanner = myBluetooth.getBluetoothLeScanner();
         leDevices = new ArrayList<>();
         toggleButton.setOnClickListener(new View.OnClickListener() {
@@ -191,10 +284,46 @@ public class BluetoothFragment extends Fragment {
         pairList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getContext(),"Connected",Toast.LENGTH_LONG).show();
+
+                // gatt = bluetoothDevice.connectGatt(getContext(),true,gattCallback);
+                dengeGatt = dengeDevice.connectGatt(getContext(),false, gattCallback);
+
+
+
+                //Toast.makeText(getContext(),"Connection request"+dengeDevice.getAddress(),Toast.LENGTH_LONG).show();
+                Log.i(TAG, "Bağlanılan: " + dengeGatt.getDevice().getAddress() );
+                view.setEnabled(false);
                 return true;
             }
         });
+
+
+        getBatteryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(),"Pil Butonu",Toast.LENGTH_LONG).show();
+                 batteryService = dengeGatt.getService(Battery_Service_UUID);
+                 ivmeService = dengeGatt.getService(Ivme_Servisi_UUID);
+                if(batteryService == null && ivmeService == null) {
+                    Log.d(TAG, "Battery service not found!");
+                    return;
+                }
+                batteryLevel = batteryService.getCharacteristic(Battery_Level_UUID);
+                ivmeDeger= ivmeService.getCharacteristic(Ivme_Verisi_UUID);
+
+                if(batteryLevel == null) {
+                    Log.d(TAG, "Battery level not found!");
+                    return;
+                }
+                //dengeGatt.readCharacteristic(batteryLevel);
+                dengeGatt.readCharacteristic(ivmeDeger);
+
+                Toast.makeText(getContext(),"Pil Butonu",Toast.LENGTH_LONG).show();
+
+            }
+        });
+
+
         return fragmentView;
     }
 
